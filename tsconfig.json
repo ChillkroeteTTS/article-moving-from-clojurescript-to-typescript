@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "outDir": "./built",
+        "allowJs": true,
+        "target": "es5",
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitThis": true,
+        "noImplicitAny": false,
+        "strictNullChecks": true,
+        "noEmit": true, // actual compiling is handled by rn-cli.config.js
+        "jsx": "react-native",
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "lib": ["es6"]
+    },
+    "include": [
+        "src/**/.*",
+        "tests/**/.*"
+    ],
+    "exclude": [
+        "built",
+        "node_modules"
+    ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "article-test",
+  "version": "0.0.1",
+  "dependencies": {
+    "immutable": "^4.0.0-rc.9",
+    "react-redux": "^5.0.7",
+    "loglevel": "^1.6.1",
+    "redux": "^4.0.0",
+    "typescript": "^3.0.1"
+  },
+  "devDependencies": {}
+}
