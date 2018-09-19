@@ -1,9 +1,10 @@
-After doing my first React Native application with Clojurescript, my next application felt like a good opportunity to revisit Javascript as I was tired of using the Clojurescript/JS interop with libraries clearly designed for another language than I was using.
-As my last intensive contact with Javascript was 3 years ago, I was curious of how my own perspective and the language itself evolved. However, programming wouldn't be programming if this project wouldn't have its pitfalls prepared for me. By sharing my experience I hope to spare you from some mistakes I did.
+After finishing my first React Native application with Clojurescript, my next application felt like a good opportunity to revisit Javascript. Although I love clojure(script), using third-party libraries clearly designed for JS proved to be a painful experience.
+As my last intensive contact with Javascript was 3 years ago, I was curious of how my own perspective and the language itself evolved. However, programming wouldn't be programming if this project wouldn't have its pitfalls prepared for me. 
+By sharing my experience I hope to spare you from some mistakes I did.
 
-After my time with Clojure I didn't want to miss concepts like the great state management I was used from [(re-frame)](https://github.com/Day8/re-frame), Clojures immutable datastructures and a flexible way to assert the structure they have [(clojure.spec)](https://clojure.org/about/spec).
+After my time using Clojure I didn't want to miss concepts like the great state management I was used from [(re-frame)](https://github.com/Day8/re-frame), Clojures immutable datastructures and a flexible way to assert their structure [(clojure.spec)](https://clojure.org/about/spec).
 Luckily I found promising counterparts in Javascript. Namely [redux (State Management)](https://redux.js.org/), [Immutable.JS](https://facebook.github.io/immutable-js/) and [Typescript](https://www.typescriptlang.org/). Setting them up was pretty straightforward and especially Typescript amazed me by not forcing you into some tight rule corset - if you don't feel the need to type everything, just turn the rule off.
-The only thing I couldn't find a replacement for is my precious REPL, but you can't have everything I guess... But let's get started
+The only thing I couldn't find a replacement for is my precious REPL, but you can't have everything I guess... Anyway, let's  get started!
 
 ## Main Differences
 
@@ -11,15 +12,15 @@ In this part I want to talk briefly about the main differences between the afore
 
 ### Redux
 
-Coming from re-frame, understanding redux is easy. You can compare re-frames 'dominoes' directly to the concepts of redux. What is the `app-state` for re-frame is the `store` for redux. However there are a few things to consider:
+Coming from re-frame, understanding redux is easy. You can compare re-frames 'dominoes' directly to the concepts of redux. What the `app-state` is for re-frame is the `store` for redux. However there are a few things to consider:
 
-- Instead of beeing managed by the re-frame library, redux's `store` is an object created by yourself with `const store = createStore(reducer)`.
-- Mutating your state happens by explicit calls to the object methods of your store. In theory you could have multiple store in your application... However don't do something just because you can. The creators of re-frame [explain](https://github.com/Day8/re-frame/blob/master/docs/ApplicationState.md) way better than I ever could why it's a good idea to have your state in one place.
+- Instead of beeing managed by the re-frame library, redux's `store` is an object created by yourself, e.g. `const store = createStore(reducer)`.
+- Mutating your state happens by explicit calls to the object methods of your store. In theory you could have multiple stores in your application... However don't do something just because you can. The creators of re-frame [explain](https://github.com/Day8/re-frame/blob/master/docs/ApplicationState.md) way better than I ever could why it's a good idea to have your state in one place.
 - As a result I distinguish between the `store` and the `state` where the former controls the mutation of the latter.
 
 **1st Domino: Event Dispatch**
 
-What re-frame describes as `event` is in redux an `action` which is a JS object containing the key 'type', e.g. `{type: 'logout'}`.
+What re-frame describes as `event` is in redux an `action`. It is a plain JS object containing the key 'type', e.g. `{type: 'logout'}`.
 Actions are dispatched by a function literally called `store.dispatch(action)`
 
 **2nd/3rd Domino: Event/Effect Handling**
@@ -28,12 +29,12 @@ Instead of registering different event handlers as in re-frame, redux passes eac
 
 **4th Domino: Query**
 
-It is worth mentioning that in theory redux's functionality ends here with providing the `store.subscribe(listener)` function. This subscribe function is not to be confused with the one re-frame provides and much more low-level. In redux `subscribe` registers a state listener which is called **any time** the state **might** have changed. For comparison components using re-frame's `subscribe` function are re-rendered only if the part of the state that's of interest actually changed.
+It is worth mentioning that in theory redux's functionality ends here by providing the `store.subscribe(listener)` function. This subscribe function is not to be confused with the one re-frame provides and much more low-level. In redux `subscribe` registers a state listener which is called **any time** the state **might** have changed. For comparison, components using re-frame's `subscribe` function are re-rendered only if the part of the state that's of interest actually changed.
 
 A better comparison (and commonly used) is [react-redux](https://github.com/reduxjs/react-redux).
-It provides you with the `connect(mapStateToProps)(yourComponent)` function which returns you a wrapped version of your component. This wrapped version's props contain injected data from your state as defined in your `mapStateToProps` function.
+It provides you with the `connect(mapStateToProps)(YourComponent)` function which returns you a wrapped version of your component. This wrapped version's props contain injected data from your state as defined in your `mapStateToProps` function.
 
-_Example using connect() and mapStateToProps()_
+_Example Using connect() and mapStateToProps()_
 
 ```
 const mapStateToProps = (state: State) => {
@@ -51,7 +52,7 @@ export const MyComponent = connect(mapStateToProps)(MyUnmappedComponent)
 
 **5th Domino: View**
 
-_Example simple JSX:_
+_Example Simple JSX_
 
 ```
 return <Text>2+2={2+2}</Text> /* Evaluates to 2+2=4 */
@@ -59,7 +60,7 @@ return <Text>2+2={2+2}</Text> /* Evaluates to 2+2=4 */
 
 [JSX](https://reactjs.org/docs/introducing-jsx.html) is an HTML like syntax extension used to describe your React (Native) UI. Formerly using [Hiccup](https://github.com/weavejester/hiccup) I do had some moments where I missed having simple lists for this but JSX really does a good job. It compiles to function calls and thus can be handled (almost) as easily as any other first class citizen.
 
-_Example JSX as datastructure:_
+_Example JSX as Datastructure_
 
 ```
   const persons = List(['Lucy', 'Andrew']);
@@ -71,6 +72,7 @@ _Example JSX as datastructure:_
 
 For all our stateful components we need to create classes so they can hold the UI state. Maybe it's just me but intuitively I would say the following looks rock solid:
 
+_Simple Stateful Component_
 ```
 class ThisIsAwesome extends Component<any> {
   state: {toggle:boolean}
@@ -91,6 +93,7 @@ class ThisIsAwesome extends Component<any> {
 
 However for Javascript the **this** in the switchToggle function refers to the Button object which leads to an exception because Button misses a state member named 'toggle'. I saw some people fixing this by binding each functions **this** in the constructor:
 
+_Explicit this Binding_
 ```
 constructor(props) {
   super(props);
@@ -99,9 +102,10 @@ constructor(props) {
 }
 ```
 
-In my opinion this is not just tedious, but also error prone(easy to forget) and also doesn't fit in our immutable world.
+In my opinion this is not just tedious, it is also error prone(easy to forget) and somehow nagging on my immutable oppinion on mutability.
 Instead I use an arrow function for each and every class function. This way I can stop thinking about this matter.
 
+_Implicit this Binding With Arrow Functions_
 ```
 switchToggle2 = () => { this.setState({ toggle: !this.state.toggle }) }
 ```
