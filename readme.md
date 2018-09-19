@@ -1,10 +1,10 @@
 After finishing my first React Native application with Clojurescript, my next application felt like a good opportunity to revisit Javascript. Although I love clojure(script), using third-party libraries clearly designed for JS proved to be a painful experience.
-As my last intensive contact with Javascript was 3 years ago, I was curious of how my own perspective and the language itself evolved. However, programming wouldn't be programming if this project wouldn't have its pitfalls prepared for me. 
+As my last intensive contact with Javascript was 3 years ago, I was curious of how my own perspective and the language itself evolved. However, programming wouldn't be programming if this project wouldn't have its pitfalls prepared for me.
 By sharing my experience I hope to spare you from some mistakes I did.
 
 After my time using Clojure I didn't want to miss concepts like the great state management I was used from [(re-frame)](https://github.com/Day8/re-frame), Clojures immutable datastructures and a flexible way to assert their structure [(clojure.spec)](https://clojure.org/about/spec).
 Luckily I found promising counterparts in Javascript. Namely [redux (State Management)](https://redux.js.org/), [Immutable.JS](https://facebook.github.io/immutable-js/) and [Typescript](https://www.typescriptlang.org/). Setting them up was pretty straightforward and especially Typescript amazed me by not forcing you into some tight rule corset - if you don't feel the need to type everything, just turn the rule off.
-The only thing I couldn't find a replacement for is my precious REPL, but you can't have everything I guess... Anyway, let's  get started!
+The only thing I couldn't find a replacement for is my precious REPL, but you can't have everything I guess... Anyway, let's get started!
 
 ## Main Differences
 
@@ -73,6 +73,7 @@ _Example JSX as Datastructure_
 For all our stateful components we need to create classes so they can hold the UI state. Maybe it's just me but intuitively I would say the following looks rock solid:
 
 _Simple Stateful Component_
+
 ```
 class ThisIsAwesome extends Component<any> {
   state: {toggle:boolean}
@@ -94,6 +95,7 @@ class ThisIsAwesome extends Component<any> {
 However for Javascript the **this** in the switchToggle function refers to the Button object which leads to an exception because Button misses a state member named 'toggle'. I saw some people fixing this by binding each functions **this** in the constructor:
 
 _Explicit this Binding_
+
 ```
 constructor(props) {
   super(props);
@@ -106,6 +108,7 @@ In my opinion this is not just tedious, it is also error prone(easy to forget) a
 Instead I use an arrow function for each and every class function. This way I can stop thinking about this matter.
 
 _Implicit this Binding With Arrow Functions_
+
 ```
 switchToggle2 = () => { this.setState({ toggle: !this.state.toggle }) }
 ```
@@ -149,26 +152,28 @@ export function registerReducers() {
 }
 ```
 
-This allowes for a different set of action handlers for testing and having the function definition in one place.
+This allows for a different set of action handlers for testing and provides me with a single place to edit when adding new handlers.
 
 > To be honest there are still 2 places edit: the function definition/registering and the enum definition with the set of valid action types. However looking at it this way, redux proposal requires me to edit 3 places in the code.
 
 ## Marrying Typescript with Immutable.js
 
-Holding your state in an immutable datastructure makes me feel a lot safer while rushing through my code at 2am. However, although Immutable.js provides proper type definitions for it’s exported Objects, Typescript's type system describes the structure of plain JS Objects, not the key-value pairs your immutable.Map object contains. Expecting to work in an error safe environment this was a real bummer for me.
+Holding the state in an immutable datastructure makes me feel a lot safer while rushing through code at 2am. However, although Immutable.js provides proper type definitions for its exported Objects, Typescript's type system describes the structure of plain JS Objects, not the key-value pairs your immutable.Map object contains. Expecting to work in an environment where my datastructures are validated at compile time, this was a real bummer for me.
 
 ### What I Expected
 
-- auto-completion and validation of datastructures
+- auto-completion and validation of state/props
 - auto-completion and validation of dispatched actions (type and parameters)
-- one place to edit when adding a new datastructure
-- one place to edit when adding a new reducer
-- mockable reducers (and when I say mockable, I mean pluggable)
+- one place to edit when adding a new datastructures to the state
+- one place to edit when adding a new event handler
+- mockable event handlers (and when I say mockable, I mean pluggable)
 - having an immutable, typed state
 
 ### Typing Immutable Datastructures
 
-Browsing StackOverflow the common solution to type immutable.Map seems to be to create 1. the interface for the mutable JS object and 2. an interface for the immutable.Map object which is expected to contain kv-pairs with the keys defined in the first
+Browsing StackOverflow the common solution to type immutable.Map seems to be to create 1. the interface for the mutable JS object and 2. an interface for the immutable.Map object which is expected to contain kv-pairs with the keys defined in the former.
+
+_One Solution to validate object access to immutable.Map_
 
 ```
 interface State {
@@ -181,7 +186,7 @@ interface ImmutableDatastructure extends Map<string, any> {
 }
 ```
 
-However this would require me to duplicate a lot of code every time I add a new type. Instead I created a generic interface which describes this pattern for me:
+However this requires me to duplicate a lot of code any time I add a new type. Instead, I created a generic interface which describes this pattern for me:
 
 ```
 interface ImmutableOf<T> extends Map<string, any> {
@@ -211,16 +216,19 @@ For this we need two important types:
 - the `Action` type describes the structure of a dispatchable action
 - the `ActionType` describes which values the 'type' property of an action can take
 
-By specifying the first while store creation
+By specifying the first during store creation
+
+_Describe the Structure of the Stores State and Actions_
 
 ```
 export const store: Store<State, Action> = createStore(mainReducer.bind(null, initialStore));
 ```
 
-and the second in the [registerReducer()](#adding-reducers) definition, dispatching actions and registering reducers is typed.  
-Question now is how `Action` and `ActionType` look.
-
+and the second in the [registerReducer()](#adding-reducers) definition, Typescript knows which actions are valid and which are not.  
+Question now is how `Action` and `ActionType` look like.
 My first approach was the following:
+
+_Typing of Action and Actiontype with 'type' validation_
 
 ```
 export enum ActionType {
@@ -234,7 +242,9 @@ export interface Action {
 }
 ```
 
-This way the action type when dispatching actions or registering reducers is validated and I got auto-completion. Also I have a single place for defining new action types. This worked very well for me until I added reducers with parameters. As to be expected this lead to numerous manual lookups for the exact parameter name and runtime errors while adding new parameters to old reducers. To fix this I came up with a second approach:
+This way the action type is validated and I get auto-completion when dispatching actions or registering event handlers. Also I have a single place for defining new action types. This worked very well for until I added event handlers with parameters. As to be expected this lead to numerous manual lookups for the exact parameter name and runtime errors while adding new parameters to old event handlers. To fix this I came up with a second approach:
+
+_Typing of Action and Actiontype with parameter validation_
 
 ```
 interface ActionWithoutParams {
@@ -253,9 +263,9 @@ export type Action = ActionWithoutParams | Action3
 export type ActionType = Action['type']
 ```
 
-This way everytime I add an action without params, I just add the action type to the `ActionWithoutParams` interface. Actions with params however require me to add a dedicated interface as well as to add this interface to the `Action` type definition. However the more work is totally worth it.
-Whenever I try to dispatch an action with the action type 'action3', Typescript infers that 'param1' and 'param2' are also needed to be a valid object. Including auto-completion.
+This way everytime an action withouth params is added, only the `ActionWithoutParams` interface is changed. Actions with params however require to add a dedicated interface as well as to add this interface to the `Action` type definition. In my oppinion the additioanl work is totally worth it.
+Whenever an action with the action type 'action3' is dispatched, Typescript infers that 'param1' and 'param2' are also requiredfor a valid action object. Including auto-completion.
 
 ### What is Still Missing
 
-The only thing I couldn't achieve so far is to touch only one place in my codebase to add a new reducer. In fact, when I add a reducer with parameters, there are 3 places to touch: registration, interface declaration for parameters, `Action` definition.
+The only thing I couldn't achieve so far is to touch a single place in my codebase when adding a new event handler. In fact, when I add a event handler with parameters, there are 3 places to touch: registration, interface declaration for parameters, `Action` definition.
