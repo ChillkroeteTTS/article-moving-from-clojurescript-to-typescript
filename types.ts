@@ -1,4 +1,4 @@
-import { Map } from "immutable";
+import { Map, List } from "immutable";
 
 interface ImmutableOf<T> extends Map<string, any> {
   toJS(): T;
@@ -12,6 +12,7 @@ export type Datastructure1 = ImmutableOf<{
 export type State = ImmutableOf<{
   firstKey: boolean;
   nestedDs: Datastructure1;
+  names: List<string>;
 }>;
 
 interface ActionWithoutParams {

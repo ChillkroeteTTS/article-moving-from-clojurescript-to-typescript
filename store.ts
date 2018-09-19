@@ -5,7 +5,8 @@ import { fromJS } from "immutable";
 
 const initialState: State = fromJS({
   firstKey: 0,
-  nestedDs: { randomProperty: 1 }
+  nestedDs: { randomProperty: 1 },
+  names: ["Lucy", "Andrew"]
 });
 
 export const store: Store<State, Action> = createStore(
