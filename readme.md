@@ -73,30 +73,30 @@ For all our stateful components we need to create classes so they can hold the U
 
 ```
 class ThisIsAwesome extends Component<any> {
-    state: {toggle:boolean}
-    constructor(props) {
-    	super(props);
-        this.state = {toggle:false}
-	}
+  state: {toggle:boolean}
+  constructor(props) {
+    super(props);
+    this.state = {toggle:false}
+  }
 
-    switchToggle() {this.setState({ toggle: !this.state.toggle })}
+  switchToggle() {this.setState({ toggle: !this.state.toggle })}
 
-    render() {
-		<Button onPress={this.switchToggle2}>
-			<Text>{this.state.toggle.toString()}</Text>
-		</Button>
-    }
+  render() {
+	  <Button onPress={this.switchToggle2}>
+	  <Text>{this.state.toggle.toString()}</Text>
+	  </Button>
+  }
 }
 ```
 
 However for Javascript the **this** in the switchToggle function refers to the Button object which leads to an exception because Button misses a state member named 'toggle'. I saw some people fixing this by binding each functions **this** in the constructor:
 
 ```
-    constructor(props) {
-        super(props);
-        this.state = { toggle: false };
-        this.switchToggle = this.switchToggle.bind(this);
-    }
+constructor(props) {
+  super(props);
+  this.state = { toggle: false };
+  this.switchToggle = this.switchToggle.bind(this);
+}
 ```
 
 In my opinion this is not just tedious, but also error prone(easy to forget) and also doesn't fit in our immutable world.
@@ -119,29 +119,29 @@ type ActionFn = (state: State, action: Action) => State;
 let wiring = Map<ActionType, ActionFn>();
 
 export function registerReducer(type: ActionType, fn: ActionFn) {
-    wiring = wiring.set(type, fn);
-    return type;
+  wiring = wiring.set(type, fn);
+  return type;
 }
 
 function mainReducer(initialState: State, state: State, action: Action) {
-    if (typeof state === "undefined") return initialState;
-    if (!wiring.has(action.type)) {
-    	const errStr = `Couldn't find action from type ${action.type}`
-        log.error(errStr);
-        throw errStr;
-    } else {
-        const reducer = wiring.get(action.type)!;
-        const newState = reducer(state, action);
-        if (newState == undefined) throw `State returned by reducer ${action.type} is faulty.";
-        return newState;
-    }
+  if (typeof state === "undefined") return initialState;
+  if (!wiring.has(action.type)) {
+    const errStr = `Couldn't find action from type ${action.type}`
+    log.error(errStr);
+    throw errStr;
+  } else {
+    const reducer = wiring.get(action.type)!;
+    const newState = reducer(state, action);
+    if (newState == undefined) throw `State returned by reducer ${action.type} is faulty.";
+    return newState;
+  }
 }
 
 export function registerReducers() {
-    clearReducers();
-    registerReducer('testActionHandler', function (state: State) {
-        return state.set('tested', true);
-    });
+  clearReducers();
+  registerReducer('testActionHandler', function (state: State) {
+    return state.set('tested', true);
+  });
 }
 ```
 
@@ -168,12 +168,12 @@ Browsing StackOverflow the common solution to type immutable.Map seems to be to 
 
 ```
 interface State {
-	firstKey: boolean
-    [..]
+  firstKey: boolean
+  [..]
 }
 interface ImmutableDatastructure extends Map<string, any> {
-    toJS(): State;
-    get<K extends keyof State>(key: K): State[K];
+  toJS(): State;
+  get<K extends keyof State>(key: K): State[K];
 }
 ```
 
@@ -181,8 +181,8 @@ However this would require me to duplicate a lot of code every time I add a new 
 
 ```
 interface ImmutableOf<T> extends Map<string, any> {
-    toJS(): T;
-    get<K extends keyof T>(key: K): T[K];
+  toJS(): T;
+  get<K extends keyof T>(key: K): T[K];
 }
 ```
 
@@ -190,13 +190,13 @@ This way the type definition for the immutable.Map happens in one place:
 
 ```
 export type Datastructure1 = ImmutableOf<{
-    [..]
+  [..]
 }>;
 
 export type State = ImmutableOf<{
-	firstKey: boolean
-    nestedDs: Datastructure1
-    […]
+  firstKey: boolean
+  nestedDs: Datastructure1
+  […]
 }>;
 ```
 
@@ -220,13 +220,13 @@ My first approach was the following:
 
 ```
 export enum ActionType {
-    invalidateFirstStartup,
-    appIsConfigured,
-    removeProductFromSearchResult
+  invalidateFirstStartup,
+  appIsConfigured,
+  removeProductFromSearchResult
 }
 export interface Action {
-    type: ActionType,
-    [x: string]: any
+  type: ActionType,
+  [x: string]: any
 }
 ```
 
@@ -234,14 +234,14 @@ This way the action type when dispatching actions or registering reducers is val
 
 ```
 interface ActionWithoutParams {
-    type: 'action1' | 'action2'
+  type: 'action1' | 'action2'
 }
 
 export interface Action3 {
-    type: 'action3'
-    param1: number
-    param2: boolean
-    [..]
+  type: 'action3'
+  param1: number
+  param2: boolean
+  [..]
 }
 
 export type Action = ActionWithoutParams | Action3
