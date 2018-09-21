@@ -1,22 +1,22 @@
-After finishing my first React Native application with Clojurescript, my next application felt like a good opportunity to revisit Javascript. Although I love clojure(script), using third-party libraries clearly designed for JS proved to be a painful experience.
-As my last intensive contact with Javascript was 3 years ago, I was curious of how my own perspective and the language itself evolved. However, programming wouldn't be programming if this project wouldn't have its pitfalls prepared for me.
+After finishing my first React Native application with Clojurescript, my next application felt like a good opportunity to revisit Javascript. Although I love Clojure(script), using third-party libraries clearly designed for JS proved to be a painful experience.
+As my last intensive contact with Javascript was 3 years ago, I was curious about how my own perspective and the language itself evolved. However, programming wouldn't be programming if this project wouldn't have its pitfalls prepared for me.
 By sharing my experience I hope to spare you from some mistakes I did.
 
-After my time using Clojure I didn't want to miss concepts like the great state management I was used from [(re-frame)](https://github.com/Day8/re-frame), Clojures immutable datastructures and a flexible way to assert their structure [(clojure.spec)](https://clojure.org/about/spec).
+After my time using Clojure I didn't want to miss concepts like the great state management I was used from [(re-frame)](https://github.com/Day8/re-frame), Clojure's immutable data structures and a flexible way to assert their structure [(clojure.spec)](https://clojure.org/about/spec).
 Luckily I found promising counterparts in Javascript. Namely [redux (State Management)](https://redux.js.org/), [Immutable.JS](https://facebook.github.io/immutable-js/) and [Typescript](https://www.typescriptlang.org/). Setting them up was pretty straightforward and especially Typescript amazed me by not forcing you into some tight rule corset - if you don't feel the need to type everything, just turn the rule off.
 The only thing I couldn't find a replacement for is my precious REPL, but you can't have everything I guess... Anyway, let's get started!
 
 ## Main Differences
 
-In this part I want to talk briefly about the main differences between the aforementioned Clojurescript+re-frame tech stack and Typescript+redux. If you are familiar with Javascript/React (Native)/Redux you can easily skip this section. Also this is far from a thorough guide and does not replace a good look into each technologies documentation.
+In this part, I want to talk briefly about the main differences between the aforementioned Clojurescript+re-frame tech stack and Typescript+redux. If you are familiar with Javascript/React (Native)/Redux you can easily skip this section. Also, this is far from a thorough guide and does not replace a good look at each technologies documentation.
 
 ### Redux
 
-Coming from re-frame, understanding redux is easy. You can compare re-frames 'dominoes' directly to the concepts of redux. What the `app-state` is for re-frame is the `store` for redux. However there are a few things to consider:
+Coming from re-frame, understanding redux is easy. You can compare re-frames 'dominoes' directly to the concepts of redux. What the `app-state` is for re-frame is the `store` for redux. However, there are a few things to consider:
 
-- Instead of beeing managed by the re-frame library, redux's `store` is an object created by yourself, e.g. `const store = createStore(reducer)`.
-- Mutating your state happens by explicit calls to the object methods of your store. In theory you could have multiple stores in your application... However don't do something just because you can. The creators of re-frame [explain](https://github.com/Day8/re-frame/blob/master/docs/ApplicationState.md) way better than I ever could why it's a good idea to have your state in one place.
-- As a result I distinguish between the `store` and the `state` where the former controls the mutation of the latter.
+- Instead of being managed by the re-frame library, redux's `store` is an object created by yourself, e.g. `const store = createStore(reducer)`.
+- Mutating your state happens by explicit calls to the object methods of your store. In theory, you could have multiple stores in your application... However, don't do something just because you can. The creators of re-frame [explain](https://github.com/Day8/re-frame/blob/master/docs/ApplicationState.md) way better than I ever could why it's a good idea to have your state in one place.
+- As a result, I distinguish between the `store` and the `state` where the former controls the mutation of the latter.
 
 **1st Domino: Event Dispatch**
 
@@ -29,7 +29,7 @@ Instead of registering different event handlers as in re-frame, redux passes eac
 
 **4th Domino: Query**
 
-It is worth mentioning that in theory redux's functionality ends here by providing the `store.subscribe(listener)` function. This subscribe function is not to be confused with the one re-frame provides and much more low-level. In redux `subscribe` registers a state listener which is called **any time** the state **might** have changed. For comparison, components using re-frame's `subscribe` function are re-rendered only if the part of the state that's of interest actually changed.
+It is worth mentioning that in theory, redux's functionality ends here by providing the `store.subscribe(listener)` function. This subscribe function is not to be confused with the one re-frame provides and much more low-level. In redux `subscribe` registers a state listener which is called **any time** the state **might** have changed. For comparison, components using re-frame's `subscribe` function are re-rendered only if the part of the state that's of interest actually changed.
 
 A better comparison (and commonly used) is [react-redux](https://github.com/reduxjs/react-redux).
 It provides you with the `connect(mapStateToProps)(YourComponent)` function which returns you a wrapped version of your component. This wrapped version's props contain injected data from your state as defined in your `mapStateToProps` function.
@@ -58,7 +58,7 @@ _Example Simple JSX_
 return <Text>2+2={2+2}</Text> /* Evaluates to 2+2=4 */
 ```
 
-[JSX](https://reactjs.org/docs/introducing-jsx.html) is an HTML like syntax extension used to describe your React (Native) UI. Formerly using [Hiccup](https://github.com/weavejester/hiccup) I do had some moments where I missed having simple lists for this but JSX really does a good job. It compiles to function calls and thus can be handled (almost) as easily as any other first class citizen.
+[JSX](https://reactjs.org/docs/introducing-jsx.html) is an HTML like syntax extension used to describe your React (Native) UI. Formerly using [Hiccup](https://github.com/weavejester/hiccup) I did have some moments where I missed having simple lists for this but JSX really does a good job. It compiles to function calls and thus can be handled (almost) as easily as any other first-class citizen.
 
 _Example JSX as Datastructure_
 
@@ -85,14 +85,14 @@ class ThisIsAwesome extends Component<any> {
   switchToggle() {this.setState({ toggle: !this.state.toggle })}
 
   render() {
-	  <Button onPress={this.switchToggle2}>
-	  <Text>{this.state.toggle.toString()}</Text>
-	  </Button>
+      <Button onPress={this.switchToggle2}>
+      <Text>{this.state.toggle.toString()}</Text>
+      </Button>
   }
 }
 ```
 
-However for Javascript the **this** in the switchToggle function refers to the Button object which leads to an exception because Button misses a state member named 'toggle'. I saw some people fixing this by binding each functions **this** in the constructor:
+However, for Javascript, the **this** in the switchToggle function refers to the Button object which leads to an exception because Button misses a state member named 'toggle'. I saw some people fixing this by binding each function's **this** in the constructor:
 
 _Explicit this Binding_
 
@@ -104,8 +104,8 @@ constructor(props) {
 }
 ```
 
-In my opinion this is not just tedious, it is also error prone(easy to forget) and somehow nagging on my immutable oppinion on mutability.
-Instead I use an arrow function for each and every class function. This way I can stop thinking about this matter.
+In my opinion, this is not just tedious, it is also error prone(easy to forget) and somehow nagging on my immutable opinion on mutability.
+Instead, I use an arrow function for each and every class function. This way I can stop thinking about this matter.
 
 _Implicit this Binding With Arrow Functions_
 
@@ -154,22 +154,22 @@ export function registerReducers() {
 
 This allows for a different set of action handlers for testing and provides me with a single place to edit when adding new handlers.
 
-> To be honest there are still 2 places edit: the function definition/registering and the enum definition with the set of valid action types. However looking at it this way, redux proposal requires me to edit 3 places in the code.
+> , To be honest, there are still 2 places edit: the function definition/registering and the enum definition with the set of valid action types. However looking at it this way, redux's proposal requires me to edit 3 places in the code.
 
 ## Marrying Typescript with Immutable.js
 
-Holding the state in an immutable datastructure makes me feel a lot safer while rushing through code at 2am. However, although Immutable.js provides proper type definitions for its exported Objects, Typescript's type system describes the structure of plain JS Objects, not the key-value pairs your immutable.Map object contains. Expecting to work in an environment where my datastructures are validated at compile time, this was a real bummer for me.
+Holding the state in an immutable data structure makes me feel a lot safer while rushing through code at 2 am. However, although Immutable.js provides proper type definitions for its exported Objects, Typescript's type system describes the structure of plain JS Objects, not the key-value pairs your immutable.Map object contains. Expecting to work in an environment where my data structures are validated at compile time, this was a real bummer for me.
 
 ### What I Expected
 
 - auto-completion and validation of state/props
 - auto-completion and validation of dispatched actions (type and parameters)
-- one place to edit when adding a new datastructures to the state
+- one place to edit when adding a new data structures to the state
 - one place to edit when adding a new event handler
 - mockable event handlers (and when I say mockable, I mean pluggable)
 - having an immutable, typed state
 
-### Typing Immutable Datastructures
+### Typing Immutable Data Structures
 
 Browsing StackOverflow the common solution to type immutable.Map seems to be to create 1. the interface for the mutable JS object and 2. an interface for the immutable.Map object which is expected to contain kv-pairs with the keys defined in the former.
 
@@ -186,7 +186,7 @@ interface ImmutableDatastructure extends Map<string, any> {
 }
 ```
 
-However this requires me to duplicate a lot of code any time I add a new type. Instead, I created a generic interface which describes this pattern for me:
+However, this requires me to duplicate a lot of code any time I add a new type. Instead, I created a generic interface which describes this pattern for me:
 
 ```
 interface ImmutableOf<T> extends Map<string, any> {
@@ -242,7 +242,7 @@ export interface Action {
 }
 ```
 
-This way the action type is validated and I get auto-completion when dispatching actions or registering event handlers. Also I have a single place for defining new action types. This worked very well for until I added event handlers with parameters. As to be expected this lead to numerous manual lookups for the exact parameter name and runtime errors while adding new parameters to old event handlers. To fix this I came up with a second approach:
+This way the action type is validated and I get auto-completion when dispatching actions or registering event handlers. Also, I have a single place for defining new action types. This worked very well for until I added event handlers with parameters. As to be expected this lead to numerous manual lookups for the exact parameter name and runtime errors while adding new parameters to old event handlers. To fix this I came up with a second approach:
 
 _Typing of Action and Actiontype with parameter validation_
 
@@ -263,9 +263,9 @@ export type Action = ActionWithoutParams | Action3
 export type ActionType = Action['type']
 ```
 
-This way everytime an action withouth params is added, only the `ActionWithoutParams` interface is changed. Actions with params however require to add a dedicated interface as well as to add this interface to the `Action` type definition. In my oppinion the additioanl work is totally worth it.
-Whenever an action with the action type 'action3' is dispatched, Typescript infers that 'param1' and 'param2' are also requiredfor a valid action object. Including auto-completion.
+This way every time an action without params is added, only the `ActionWithoutParams` interface is changed. Actions with params however require to add a dedicated interface as well as to add this interface to the `Action` type definition. In my opinion, the additional work is totally worth it.
+Whenever an action with the action type 'action3' is dispatched, Typescript infers that 'param1' and 'param2' are also required for a valid action object. Including auto-completion.
 
 ### What is Still Missing
 
-The only thing I couldn't achieve so far is to touch a single place in my codebase when adding a new event handler. In fact, when I add a event handler with parameters, there are 3 places to touch: registration, interface declaration for parameters, `Action` definition.
+The only thing I couldn't achieve so far is to touch a single place in my codebase when adding a new event handler. In fact, when I add an event handler with parameters, there are 3 places to touch: registration, interface declaration for parameters, `Action` definition.
